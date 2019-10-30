@@ -12,14 +12,19 @@
 {% for q in questions %}
 <form method="post" id="form-{{q.id}}" class="mt-3" >
 <input type="hidden" name="question" value="{{q.id}}" v-model="response">
-
         <label class="p-3">{{q.question_text}}</label>
+
+        <select>
+            {% for answer in  q.answer.all %}
+
+            <option value="{{answer.id}}">{{answer.answer}}</option>
+            {% endfor %}
+
+          </select>
         <div class="input-group">
 
-        <input type="text" name="response" id="response-for-{{q.id}}" class="form-control" >
-        <div class="input-group-append">
         <input type="submit" value="Submit" id="survey-submit" class="btn bg-purple text-white" >
-            </div>
+  
       </div>
 {% csrf_token %}
 </form>
@@ -68,9 +73,10 @@
             $( 'form' ).on( 'submit', function(event){
             event.preventDefault();
             var response = event.target.children[2].childNodes[1].value
-            
+            console.log(response)
             if (response != '' ){
             var question_id = event.target.children[0].value
+            console.log(question_id)
             var formData = {
                 'message':response,
                 'question_id':question_id,
@@ -83,9 +89,9 @@
             $(":submit",this)[0].value = 'Submitted';
 
             } else {
-                var errors = $('#errors')
-                errors.append(`<li class='text-danger'>Please fill in this field</li>`)
-
+                // var errors = $('#errors')
+                // errors.append(`<li class='text-danger'>Please fill in this field</li>`)
+                // errors.fadeIn('slow').delay(1000).hide(0);
                     }       
                 });
             },

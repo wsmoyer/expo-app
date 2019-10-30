@@ -6,17 +6,24 @@ from django.db.models import Count
 
 class Question(models.Model):
     question_text = models.CharField(max_length=200)
+    answer = models.ManyToManyField('Answer')
 
     def __str__(self):
         return self.question_text
     
 
-class Response(models.Model):
-    response = models.TextField(blank=True)
-    question = models.ForeignKey('Question',on_delete=models.CASCADE)
+class Answer(models.Model):
+    answer = models.CharField(max_length=300)
 
     def __str__(self):
-        return self.response
+        return self.answer
 
     def response_count(self):
-        return Response.objects.filter(response=self.response).count()
+        return Answer.objects.filter(answer=self.answer).count()
+
+
+
+class Response(models.Model):
+    question = models.ForeignKey('Question',on_delete=models.CASCADE,null=True, blank=True)
+    answer = models.ForeignKey('Answer',on_delete=models.CASCADE,null=True, blank=True)
+

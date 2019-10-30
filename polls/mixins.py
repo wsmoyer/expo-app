@@ -1,11 +1,13 @@
 from asgiref.sync import async_to_sync
-from .models import Question,Response
+from .models import Question,Response,Answer
 from channels.db import database_sync_to_async
 
 
 class SocketsDatabaseMixin:
     @database_sync_to_async
     def get_responses(self):
+        q = Question.objects.get(id=2)
+        print(q.answer.all())           
         return Response.objects.all()[:10]
 
 
