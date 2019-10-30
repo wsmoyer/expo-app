@@ -1,0 +1,12 @@
+.bg-purple{
+background: #6b0080;
+
+}
+
+* {
+    font-family: 'Poppins', sans-serif;
+}
+
+a#branding{
+    font-size: 30px;
+}

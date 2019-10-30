@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div id="app">
+<div id="responses" class="row mt-3">
+<div class="col-md-6">
+<h3>Responses</h3>
+
+<p v-for="res in responses" :key="res.id">[[res.question]]  [[res.response]]</p>
+
+</div>
+<div class="col-md-6">
+
+<h3>Questions</h3>
+<div v-for="question in questions" :key="question.id">
+<p>[[question.question]]</p>
+
+</div>
+<!-- <canvas id="chart" v-bind:class="'[[question.question]]'" ></canvas> -->
+
+</div>
+</div>
+</div>
+<script type="text/javascript">
+    new Vue({
+      el: '#app',
+      delimiters: ['[[',']]'],
+      data: {
+        responses: [],
+        questions:[],
+        
+    },
+    mounted: function() {
+        var self = this
+        var loc = window.location
+        var wsStart = 'ws://'
+        if (loc.protocol == 'https:'){
+            wsStart = 'wss://'
+        }
+        var endpoint = wsStart + loc.host + loc.pathname
+        var socket = new WebSocket(endpoint)
+        
+        self.handleOpen(socket);
+
+        self.handleMessage(socket,self);
+
+        self.handleClose(socket);
+
+        self.handleError(socket);  
+
+        var ctx = document.getElementById('chart').getContext('2d');
+        
+        self.getChart(ctx,self)
+   },
+    methods: {
+        handleOpen:function(socket){
+            socket.onopen = function(e){
+            socket.send(JSON.stringify({'command':'fetch_responses'}))
+            socket.send(JSON.stringify({'command':'fetch_questions'}))
+        }
+        },
+        handleMessage: function(socket,self){
+            socket.onmessage = function(e){     
+            var msg = JSON.parse(e.data)
+                if (msg[0].command == 'fetch_responses'){ 
+                self.responses = msg
+
+                }
+                else if (msg[0].command == 'fetch_questions'){
+                    self.questions = msg
+                    console.log(self.questions)
+                    
+                }
+                else {
+                    self.responses.push(msg[0])
+                }
+        }
+        },
+        handleClose: function(socket,self){
+            socket.onclose = function(e){
+            console.log('close',e)
+        }
+        },
+        handleError:function(socket){
+            socket.onerror = function(e){
+            console.log('error',e)
+        }
+        },
+        // getChart:function(ctx,self){
+          
+        // }
+   }
+    });
+    </script>
+</body>
+{% endblock %}

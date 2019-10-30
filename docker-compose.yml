@@ -1,0 +1,28 @@
+version: "3.6"
+
+services:
+  db:
+    image: postgres:10.1-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "54320:5432"
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    hostname: web
+    volumes:
+      - .:/application
+    depends_on:
+      - db
+    ports:
+      - 8000:8000
+    links:
+      - db
+      - redis
+volumes:
+  postgres_data:
