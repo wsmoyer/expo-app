@@ -19,11 +19,14 @@ class Answer(models.Model):
         return self.answer
 
     def response_count(self):
-        return Answer.objects.filter(answer=self.answer).count()
+        return Response.objects.filter(answer=self.answer).count()
 
 
 
 class Response(models.Model):
     question = models.ForeignKey('Question',on_delete=models.CASCADE,null=True, blank=True)
     answer = models.ForeignKey('Answer',on_delete=models.CASCADE,null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.answer.answer}'
 

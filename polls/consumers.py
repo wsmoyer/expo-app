@@ -23,7 +23,7 @@ class SurveyConsumer(AsyncConsumer,SocketsDatabaseMixin):
         for r in responses:
             new_dict = {
                 'question':r.question.question_text,
-                'response':r.response,
+                'response':r.answer.answer,
                 'command':command
             }
             new_arr.append(new_dict)
@@ -38,9 +38,17 @@ class SurveyConsumer(AsyncConsumer,SocketsDatabaseMixin):
         questions = [question for question in Question.objects.all()]
         new_arr = []
         for question in questions:
+            answers = question.answer.all().order_by('answer')
+            arr = []
+            for a in answers:
+                res = Response.objects.filter(answer=a)
+                res_dict = {'count':res.count(),'answer':a.answer}
+                arr.append(res_dict)
+            print(arr)
             new_dict = {
                 'question':question.question_text,
                 'question_id':question.id,
+                'answers':arr,
                 'command':command
             }
             new_arr.append(new_dict)
@@ -57,12 +65,10 @@ class SurveyConsumer(AsyncConsumer,SocketsDatabaseMixin):
 
         if question is not None:
             res = await self.save_response(response,question)
-            question_count = await self.count_questions()
+       
             finalResponse = {
-                'response':response,
-                'question_id':question,
+                'response':res.answer.answer,
                 'question':res.question.question_text,
-                'question_count':question_count,
                 'command':command
             }
             new_arr = []
